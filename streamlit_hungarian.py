@@ -78,7 +78,7 @@ columns_to_drop = ['ca', 'slope','thal']
 df_selected = df_selected.drop(columns_to_drop, axis=1)
 
 # mengisi field yang masih terisi null dengan mean di setiap kolomnya
-# memilih kolom yang akan diganti nilainya
+# memilih kolom dan menghapus nilai nullnya
 meanTBPS = df_selected['trestbps'].dropna()
 meanChol = df_selected['chol'].dropna()
 meanfbs = df_selected['fbs'].dropna()
@@ -86,7 +86,7 @@ meanRestCG = df_selected['restecg'].dropna()
 meanthalach = df_selected['thalach'].dropna()
 meanexang = df_selected['exang'].dropna()
 
-# mengambil dan mengubah nilai mean menjadi float
+# mengambil dan mengubah nilai dataset menjadi float
 meanTBPS = meanTBPS.astype(float)
 meanChol = meanChol.astype(float)
 meanfbs = meanfbs.astype(float)
@@ -94,7 +94,7 @@ meanthalach = meanthalach.astype(float)
 meanexang = meanexang.astype(float)
 meanRestCG = meanRestCG.astype(float)
 
-# membulatkan nilai mean
+# mengubah dan membulatkan nilai mean
 meanTBPS = round(meanTBPS.mean())
 meanChol = round(meanChol.mean())
 meanfbs = round(meanfbs.mean())
