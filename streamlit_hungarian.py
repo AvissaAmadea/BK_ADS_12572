@@ -7,6 +7,7 @@ import streamlit as st
 import time
 import pickle
 
+
 # 1) Pengumpulan Data
 # Dataset dengan nama file "hungarian.data" bersumber dari link berikut:
 # https://archive.ics.uci.edu/dataset/45/heart+disease
@@ -154,31 +155,16 @@ st.set_page_config(
   page_icon = ":heart:"
 )
 
-# st.image("jantung.png", width=100)
-
-# Menampilkan judul
-# st.markdown(
-#     """
-#     <head>
-#         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-#     </head>
-#     <div style="display: flex; align-items: center;">
-#         <h1 style="margin-bottom: 0; color: red;"><i class="fas fa-heart-pulse"></i> <span style="color: white;">Penyakit Jantung Hungarian</span></h1>
-#     </div>
-#     """,
-#     unsafe_allow_html=True
-# )
 st.markdown(
     """
-    <div style="display: flex; align-items: center; padding: 20px; border-radius: 10px; background-color: #4CAF50;">
-        <img src="https://i.imgur.com/jantung.png" alt="Heart Image" width="50" style="margin-right: 20px;">
-        <h1 style="margin-bottom: 0; color: white;"><i class="fas fa-heartbeat" style="color: #FF5733;"></i> <span style="color: white;">Penyakit Jantung Hungarian</span></h1>
+    <div style="display: flex; align-items: center; border-radius: 10px;">
+        <img src="https://raw.githubusercontent.com/AvissaAmadea/BK_ADS_12572/main/jantung.png" alt="Heart Image" width="60" style="margin-right: 7px;">
+        <h1 style="margin-bottom: 0; color: white;"><span style="color: white;">Penyakit Jantung Hungarian</span></h1>
     </div>
     """,
     unsafe_allow_html=True
 )
 # st.title("Penyakit Jantung Hungarian")
-# st.image("jantung.png", width=70)
 
 st.write(f"**_Akurasi Model_** :  :green[**{accuracy}**]%")
 # st.write("")
@@ -188,11 +174,11 @@ tab1, tab2 = st.tabs(["Single-predict", "Multi-predict"])
 
 # fungsi sidebar
 with tab1:
-  st.sidebar.header("**User Input Data** Sidebar")
+  st.sidebar.header("Sidebar untuk **Input Data**")
 
   # input data di sidebar
   age = st.sidebar.number_input(label=":blue[**Umur**]", min_value=df_final['age'].min(), max_value=df_final['age'].max())
-  st.sidebar.write(f":orange[Min] value: :orange[**{df_final['age'].min()}**], :red[Max] value: :red[**{df_final['age'].max()}**]")
+  st.sidebar.write(f":orange[Min] nilai: :orange[**{df_final['age'].min()}**], :red[Max] nilai: :red[**{df_final['age'].max()}**]")
   st.sidebar.write("")
 
   sex_sb = st.sidebar.selectbox(label=":blue[**Jenis Kelamin**]", options=["Laki-laki", "Perempuan"])
@@ -221,66 +207,66 @@ with tab1:
   # -- Value 3: non-anginal pain
   # -- Value 4: asymptomatic
 
-  trestbps = st.sidebar.number_input(label=":violet[**Resting blood pressure** (in mm Hg on admission to the hospital)]", min_value=df_final['trestbps'].min(), max_value=df_final['trestbps'].max())
-  st.sidebar.write(f":orange[Min] value: :orange[**{df_final['trestbps'].min()}**], :red[Max] value: :red[**{df_final['trestbps'].max()}**]")
+  trestbps = st.sidebar.number_input(label=":blue[**Tekanan darah istirahat** (mm Hg pada saat masuk ke rumah sakit)]", min_value=df_final['trestbps'].min(), max_value=df_final['trestbps'].max())
+  st.sidebar.write(f":orange[Min] nilai: :orange[**{df_final['trestbps'].min()}**], :red[Max] nilai: :red[**{df_final['trestbps'].max()}**]")
   st.sidebar.write("")
 
-  chol = st.sidebar.number_input(label=":violet[**Serum cholestoral** (in mg/dl)]", min_value=df_final['chol'].min(), max_value=df_final['chol'].max())
-  st.sidebar.write(f":orange[Min] value: :orange[**{df_final['chol'].min()}**], :red[Max] value: :red[**{df_final['chol'].max()}**]")
+  chol = st.sidebar.number_input(label=":blue[**Jumlah Kolesterol dalam darah** (mg/dl)]", min_value=df_final['chol'].min(), max_value=df_final['chol'].max())
+  st.sidebar.write(f":orange[Min] nilai: :orange[**{df_final['chol'].min()}**], :red[Max] nilai: :red[**{df_final['chol'].max()}**]")
   st.sidebar.write("")
 
-  fbs_sb = st.sidebar.selectbox(label=":violet[**Fasting blood sugar > 120 mg/dl?**]", options=["False", "True"])
+  fbs_sb = st.sidebar.selectbox(label=":blue[**Kadar Gula dalam darah > 120 mg/dl?**]", options=["Tidak", "Ya"])
   st.sidebar.write("")
   st.sidebar.write("")
-  if fbs_sb == "False":
+  if fbs_sb == "Tidak":
     fbs = 0
-  elif fbs_sb == "True":
+  elif fbs_sb == "Ya":
     fbs = 1
-  # -- Value 0: false
-  # -- Value 1: true
+  # -- Value 0: tidak
+  # -- Value 1: ya
 
-  restecg_sb = st.sidebar.selectbox(label=":violet[**Resting electrocardiographic results**]", options=["Normal", "Having ST-T wave abnormality", "Showing left ventricular hypertrophy"])
+  restecg_sb = st.sidebar.selectbox(label=":blue[**Hasil Resting Electrocardiographic**]", options=["Normal", "Mengalami kelainan gelombang ST-T", "Menunjukkan hipertrofi ventrikel kiri"])
   st.sidebar.write("")
   st.sidebar.write("")
   if restecg_sb == "Normal":
     restecg = 0
-  elif restecg_sb == "Having ST-T wave abnormality":
+  elif restecg_sb == "Mengalami kelainan gelombang ST-T":
     restecg = 1
-  elif restecg_sb == "Showing left ventricular hypertrophy":
+  elif restecg_sb == "Menunjukkan hipertrofi ventrikel kiri":
     restecg = 2
-  # -- Value 0: normal
-  # -- Value 1: having ST-T wave abnormality (T wave inversions and/or ST  elevation or depression of > 0.05 mV)
-  # -- Value 2: showing probable or definite left ventricular hypertrophy by Estes' criteria
+  # -- Value 0: Normal
+  # -- Value 1: Mengalami kelainan gelombang ST-T (Inversi gelombang T dan/atau elevasi atau depresi ST > 0,05 mV)
+  # -- Value 2: Menunjukkan kemungkinan atau pasti hipertrofi ventrikel kiri berdasarkan kriteria Estes
 
-  thalach = st.sidebar.number_input(label=":violet[**Maximum heart rate achieved**]", min_value=df_final['thalach'].min(), max_value=df_final['thalach'].max())
-  st.sidebar.write(f":orange[Min] value: :orange[**{df_final['thalach'].min()}**], :red[Max] value: :red[**{df_final['thalach'].max()}**]")
+  thalach = st.sidebar.number_input(label=":blue[**Denyut jantung maksimum mencapai**]", min_value=df_final['thalach'].min(), max_value=df_final['thalach'].max())
+  st.sidebar.write(f":orange[Min] nilai: :orange[**{df_final['thalach'].min()}**], :red[Max] nilai: :red[**{df_final['thalach'].max()}**]")
   st.sidebar.write("")
 
-  exang_sb = st.sidebar.selectbox(label=":violet[**Exercise induced angina?**]", options=["No", "Yes"])
+  exang_sb = st.sidebar.selectbox(label=":blue[**Angina akibat olahraga?**]", options=["Tidak", "Ya"])
   st.sidebar.write("")
   st.sidebar.write("")
-  if exang_sb == "No":
+  if exang_sb == "Tidak":
     exang = 0
-  elif exang_sb == "Yes":
+  elif exang_sb == "Ya":
     exang = 1
-  # -- Value 0: No
-  # -- Value 1: Yes
+  # -- Value 0: Tidak
+  # -- Value 1: Ya
 
-  oldpeak = st.sidebar.number_input(label=":violet[**ST depression induced by exercise relative to rest**]", min_value=df_final['oldpeak'].min(), max_value=df_final['oldpeak'].max())
-  st.sidebar.write(f":orange[Min] value: :orange[**{df_final['oldpeak'].min()}**], :red[Max] value: :red[**{df_final['oldpeak'].max()}**]")
+  oldpeak = st.sidebar.number_input(label=":blue[**Depresi ST disebabkan oleh olahraga dibandingkan istirahat**]", min_value=df_final['oldpeak'].min(), max_value=df_final['oldpeak'].max())
+  st.sidebar.write(f":orange[Min] nilai: :orange[**{df_final['oldpeak'].min()}**], :red[Max] nilai: :red[**{df_final['oldpeak'].max()}**]")
   st.sidebar.write("")
 
   # inputan data dimasukkan ke dalam variabel data
   data = {
-    'Age': age,
-    'Sex': sex_sb,
-    'Chest pain type': cp_sb,
+    'Umur': age,
+    'Jenis Kelamin': sex_sb,
+    'Tipe Nyeri Dada': cp_sb,
     'RPB': f"{trestbps} mm Hg",
-    'Serum Cholestoral': f"{chol} mg/dl",
+    'Kolesterol Serum': f"{chol} mg/dl",
     'FBS > 120 mg/dl?': fbs_sb,
     'Resting ECG': restecg_sb,
-    'Maximum heart rate': thalach,
-    'Exercise induced angina?': exang_sb,
+    'Denyut jantung maksimum': thalach,
+    'Angina akibat olahraga?': exang_sb,
     'ST depression': oldpeak,
   }
 
