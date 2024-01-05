@@ -7,17 +7,23 @@ import streamlit as st
 import time
 import pickle
 
-# membaca dataset
+# 1) Pengumpulan Data
+# Dataset dengan nama file "hungarian.data" bersumber dari link berikut:
+# https://archive.ics.uci.edu/dataset/45/heart+disease
+
+# 2) Menelaah Data --> membaca dataset
 with open("data/hungarian.data", encoding='Latin1') as file:
   lines = [line.strip() for line in file]
 
-# menyimpan dataset ke dalam variabel data, mengambil data menjadi baris-baris yang memiliki panjang 76 karakter secara berturut-turut dalam kelompok 10 baris.
+# menyimpan dataset ke dalam variabel data, 
+# mengambil data menjadi baris-baris yang memiliki panjang 76 karakter 
+# secara berturut-turut dalam kelompok 10 baris.
 data = itertools.takewhile(
   lambda x: len(x) == 76,
   (' '.join(lines[i:(i + 10)]).split() for i in range(0, len(lines), 10))
 )
 
-# membuat variabel df berisi data yang disusun dalam struktur tabel use DataFrame
+# membuat variabel df berisi data tersusun dalam struktur tabel use DataFrame
 df = pd.DataFrame.from_records(data)
 
 # Mengambil semua baris dan kolom dari DataFrame df, kecuali kolom terakhir.
@@ -29,13 +35,20 @@ df = df.drop(df.columns[0], axis=1)
 # Mengonversi semua nilai dalam DataFrame df menjadi tipe data float.
 df = df.astype(float)
 
-#Mengganti semua nilai -9.0 dalam DataFrame df dengan nilai NaN (Not a Number) dari NumPy.
+
+# 3) Validasi Data
+#Mengganti semua nilai -9.0 dalam DataFrame df 
+# dengan nilai NaN (Not a Number) dari NumPy.
 df.replace(-9.0, np.NaN, inplace=True)
 
-# Membuat DataFrame baru df_selected yang berisi kolom-kolom yang dipilih dari DataFrame df dengan menggunakan indeks kolom yang spesifik ([1, 2, 7, 8, 10, 14, 17, 30, 36, 38, 39, 42, 49, 56]).
+
+# 4) Menentukan Object Data
+# Membuat DataFrame baru df_selected yang berisi kolom-kolom yang dipilih 
+# dari DataFrame df dengan menggunakan indeks kolom yang spesifik 
+# ([1, 2, 7, 8, 10, 14, 17, 30, 36, 38, 39, 42, 49, 56]).
 df_selected = df.iloc[:, [1, 2, 7, 8, 10, 14, 17, 30, 36, 38, 39, 42, 49, 56]]
 
-# membuat column mapping untuk merename column dari dataset
+# mengganti nama kolom sesuai dengan 14 nama kolom yg ada pada deskripsi target
 column_mapping = {
   2: 'age',
   3: 'sex',
@@ -55,11 +68,16 @@ column_mapping = {
 # rename column
 df_selected.rename(columns=column_mapping, inplace=True)
 
+
+# 5) Membersihkan Data
+# terdapat fitur yang hampir 90% datanya memiliki nilai null 
+# sehingga perlu menghapus fitur tsb menggunakan fungsi drop
 # menghapus data dari 3 column
 columns_to_drop = ['ca', 'slope','thal']
 df_selected = df_selected.drop(columns_to_drop, axis=1)
 
 # mengisi field yang masih terisi null dengan mean di setiap kolomnya
+# memilih kolom yang akan diganti nilainya
 meanTBPS = df_selected['trestbps'].dropna()
 meanChol = df_selected['chol'].dropna()
 meanfbs = df_selected['fbs'].dropna()
@@ -67,6 +85,7 @@ meanRestCG = df_selected['restecg'].dropna()
 meanthalach = df_selected['thalach'].dropna()
 meanexang = df_selected['exang'].dropna()
 
+# mengambil dan mengubah nilai mean menjadi float
 meanTBPS = meanTBPS.astype(float)
 meanChol = meanChol.astype(float)
 meanfbs = meanfbs.astype(float)
@@ -74,6 +93,7 @@ meanthalach = meanthalach.astype(float)
 meanexang = meanexang.astype(float)
 meanRestCG = meanRestCG.astype(float)
 
+# membulatkan nilai mean
 meanTBPS = round(meanTBPS.mean())
 meanChol = round(meanChol.mean())
 meanfbs = round(meanfbs.mean())
@@ -81,7 +101,7 @@ meanthalach = round(meanthalach.mean())
 meanexang = round(meanexang.mean())
 meanRestCG = round(meanRestCG.mean())
 
-# mengubah nilai null menjadi nilai mean di setiap kolomnya
+# mengisi nilai null menjadi nilai mean di setiap kolomnya
 fill_values = {
   'trestbps': meanTBPS,
   'chol': meanChol,
@@ -96,13 +116,21 @@ df_clean = df_selected.fillna(value=fill_values)
 # menghapus data yang mangandung duplikasi 
 df_clean.drop_duplicates(inplace=True)
 
+
+# 6) Konstruksi Data
+# memisahkan antara fitur dan target lalu simpan ke dalam variabel baru
 X = df_clean.drop("target", axis=1)
 y = df_clean['target']
 
+# Karena persebaran jumlah target tidak seimbang maka diseimbangkan 
+# menggunakan Metode Oversampling SMOTE
 smote = SMOTE(random_state=42)
 X, y = smote.fit_resample(X, y)
 
-# Membuat file model xgb_model.pkl
+
+# 7) Membuat Model --> XGBoost
+# Membuat model dg nama file xgb_model.pkl
+# import pickle
 # with open('model/xgb_model.pkl', 'wb') as file:
 #     pickle.dump(xgb_model, file)
 
@@ -120,26 +148,54 @@ df_final['target'] = y
 # STREAMLIT
 # -------------------------------------------------------------------------------------------------
 
+# judul halaman streamlit
 st.set_page_config(
   page_title = "Hungarian Heart Disease",
   page_icon = ":heart:"
 )
 
-st.title("Hungarian Heart Disease")
-# st.write(f"**_Model's Accuracy_** :  :green[**{accuracy}**]% (:red[_Do not copy outright_])")
-st.write(f"**_Model's Accuracy_** :  :green[**{accuracy}**]%")
-st.write("")
+# st.image("jantung.png", width=100)
 
+# Menampilkan judul
+# st.markdown(
+#     """
+#     <head>
+#         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+#     </head>
+#     <div style="display: flex; align-items: center;">
+#         <h1 style="margin-bottom: 0; color: red;"><i class="fas fa-heart-pulse"></i> <span style="color: white;">Penyakit Jantung Hungarian</span></h1>
+#     </div>
+#     """,
+#     unsafe_allow_html=True
+# )
+st.markdown(
+    """
+    <div style="display: flex; align-items: center; padding: 20px; border-radius: 10px; background-color: #4CAF50;">
+        <img src="https://i.imgur.com/jantung.png" alt="Heart Image" width="50" style="margin-right: 20px;">
+        <h1 style="margin-bottom: 0; color: white;"><i class="fas fa-heartbeat" style="color: #FF5733;"></i> <span style="color: white;">Penyakit Jantung Hungarian</span></h1>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+# st.title("Penyakit Jantung Hungarian")
+# st.image("jantung.png", width=70)
+
+st.write(f"**_Akurasi Model_** :  :green[**{accuracy}**]%")
+# st.write("")
+
+# membuat 2 halaman terpisah di halaman utama
 tab1, tab2 = st.tabs(["Single-predict", "Multi-predict"])
 
+# fungsi sidebar
 with tab1:
   st.sidebar.header("**User Input Data** Sidebar")
 
-  age = st.sidebar.number_input(label=":violet[**Umur**]", min_value=df_final['age'].min(), max_value=df_final['age'].max())
+  # input data di sidebar
+  age = st.sidebar.number_input(label=":blue[**Umur**]", min_value=df_final['age'].min(), max_value=df_final['age'].max())
   st.sidebar.write(f":orange[Min] value: :orange[**{df_final['age'].min()}**], :red[Max] value: :red[**{df_final['age'].max()}**]")
   st.sidebar.write("")
 
-  sex_sb = st.sidebar.selectbox(label=":violet[**Jenis Kelamin**]", options=["Laki-laki", "Perempuan"])
+  sex_sb = st.sidebar.selectbox(label=":blue[**Jenis Kelamin**]", options=["Laki-laki", "Perempuan"])
   st.sidebar.write("")
   st.sidebar.write("")
   if sex_sb == "Laki-laki":
@@ -149,7 +205,7 @@ with tab1:
   # -- Value 0: Perempuan
   # -- Value 1: Laki-laki
 
-  cp_sb = st.sidebar.selectbox(label=":violet[**Chest pain type**]", options=["Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic"])
+  cp_sb = st.sidebar.selectbox(label=":blue[**Tipe Nyeri Dada**]", options=["Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic"])
   st.sidebar.write("")
   st.sidebar.write("")
   if cp_sb == "Typical angina":
@@ -214,6 +270,7 @@ with tab1:
   st.sidebar.write(f":orange[Min] value: :orange[**{df_final['oldpeak'].min()}**], :red[Max] value: :red[**{df_final['oldpeak'].max()}**]")
   st.sidebar.write("")
 
+  # inputan data dimasukkan ke dalam variabel data
   data = {
     'Age': age,
     'Sex': sex_sb,
@@ -227,27 +284,33 @@ with tab1:
     'ST depression': oldpeak,
   }
 
+  # memasukkan data menjadi DataFrame
   preview_df = pd.DataFrame(data, index=['input'])
 
-  st.header("User Input as DataFrame")
+  # menampilkan data inputan user ke st
+  st.header("Inputan User menjadi DataFrame")
   st.write("")
   st.dataframe(preview_df.iloc[:, :6])
   st.write("")
   st.dataframe(preview_df.iloc[:, 6:])
   st.write("")
 
+  # Variabel result diatur sebagai string ":violet[-]".
   result = ":violet[-]"
 
-  predict_btn = st.button("**Predict**", type="primary")
+  predict_btn = st.button("**Prediksi**", type="primary")
 
   st.write("")
   if predict_btn:
     inputs = [[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak]]
+
+    # Melakukan prediksi menggunakan model yang sudah dilatih sebelumnya
     prediction = model.predict(inputs)[0]
 
     bar = st.progress(0)
     status_text = st.empty()
 
+    # menampilkan proses prediksi
     for i in range(1, 101):
       status_text.text(f"{i}% complete")
       bar.progress(i)
@@ -257,36 +320,40 @@ with tab1:
         status_text.empty()
         bar.empty()
 
+    # menetapkan hasil prediksi
     if prediction == 0:
-      result = ":green[**Healthy**]"
+      result = ":green[**Sehat Wal Afiat**]"
     elif prediction == 1:
-      result = ":orange[**Heart disease level 1**]"
+      result = ":yellow[**Penyakit Jantung level 1**]"
     elif prediction == 2:
-      result = ":orange[**Heart disease level 2**]"
+      result = ":orange[**Penyakit Jantung level 2**]"
     elif prediction == 3:
-      result = ":red[**Heart disease level 3**]"
+      result = ":red[**Penyakit Jantung level 3**]"
     elif prediction == 4:
-      result = ":red[**Heart disease level 4**]"
+      result = ":red[**Penyakit Jantung level 4**]"
 
   st.write("")
   st.write("")
-  st.subheader("Prediction:")
+  st.subheader("Hasil Prediksi:")
   st.subheader(result)
 
 with tab2:
   st.header("Predict multiple data:")
 
+  # Membuat Contoh CSV dari Data Awal dari lima baris pertama dari DataFrame df_final kecuali kolom terakhir
   sample_csv = df_final.iloc[:5, :-1].to_csv(index=False).encode('utf-8')
 
   st.write("")
-  st.download_button("Download CSV Example", data=sample_csv, file_name='sample_heart_disease_parameters.csv', mime='text/csv')
+  st.download_button("Download Contoh Dataset CSV", data=sample_csv, file_name='sample_heart_disease_parameters.csv', mime='text/csv')
 
+  # Mengunggah dan Memprediksi dari File CSV yang Diunggah
   st.write("")
   st.write("")
-  file_uploaded = st.file_uploader("Upload a CSV file", type='csv')
+  file_uploaded = st.file_uploader("Upload file CSV", type='csv')
 
   if file_uploaded:
     uploaded_df = pd.read_csv(file_uploaded)
+    # melakukan prediksi menggunakan model machine learning (model.predict)
     prediction_arr = model.predict(uploaded_df)
 
     bar = st.progress(0)
@@ -301,18 +368,19 @@ with tab2:
 
     for prediction in prediction_arr:
       if prediction == 0:
-        result = "Healthy"
+        result = "Sehat Wal Afiat"
       elif prediction == 1:
-        result = "Heart disease level 1"
+        result = "Penyakit Jantung level 1"
       elif prediction == 2:
-        result = "Heart disease level 2"
+        result = "Penyakit Jantung level 2"
       elif prediction == 3:
-        result = "Heart disease level 3"
+        result = "Penyakit Jantung level 3"
       elif prediction == 4:
-        result = "Heart disease level 4"
+        result = "Penyakit Jantung level 4"
       result_arr.append(result)
 
-    uploaded_result = pd.DataFrame({'Prediction Result': result_arr})
+    # Menampilkan Hasil Prediksi dengan membagi menjadi 2 kolom: result dan parameter
+    uploaded_result = pd.DataFrame({'Hasil Prediksi': result_arr})
 
     for i in range(70, 101):
       status_text.text(f"{i}% complete")
