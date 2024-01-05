@@ -126,7 +126,8 @@ st.set_page_config(
 )
 
 st.title("Hungarian Heart Disease")
-st.write(f"**_Model's Accuracy_** :  :green[**{accuracy}**]% (:red[_Do not copy outright_])")
+# st.write(f"**_Model's Accuracy_** :  :green[**{accuracy}**]% (:red[_Do not copy outright_])")
+st.write(f"**_Model's Accuracy_** :  :green[**{accuracy}**]%")
 st.write("")
 
 tab1, tab2 = st.tabs(["Single-predict", "Multi-predict"])
@@ -138,15 +139,15 @@ with tab1:
   st.sidebar.write(f":orange[Min] value: :orange[**{df_final['age'].min()}**], :red[Max] value: :red[**{df_final['age'].max()}**]")
   st.sidebar.write("")
 
-  sex_sb = st.sidebar.selectbox(label=":violet[**Sex**]", options=["Male", "Female"])
+  sex_sb = st.sidebar.selectbox(label=":violet[**Jenis Kelamin**]", options=["Male", "Female"])
   st.sidebar.write("")
   st.sidebar.write("")
-  if sex_sb == "Male":
+  if sex_sb == "Laki-laki":
     sex = 1
-  elif sex_sb == "Female":
+  elif sex_sb == "Perempuan":
     sex = 0
-  # -- Value 0: Female
-  # -- Value 1: Male
+  # -- Value 0: Perempuan
+  # -- Value 1: Laki-laki
 
   cp_sb = st.sidebar.selectbox(label=":violet[**Chest pain type**]", options=["Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic"])
   st.sidebar.write("")
